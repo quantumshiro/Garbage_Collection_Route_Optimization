@@ -58,6 +58,6 @@ def make_address_list():
     
     for i in range(len(address)):
         print("{} = [{}, {}]".format(address[i], latitude[i], longitude[i]))
-        
+    print("address: {}".format(address))
 if __name__ == '__main__':
     make_address_list()
