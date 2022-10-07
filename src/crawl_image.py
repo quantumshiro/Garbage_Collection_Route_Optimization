@@ -8,4 +8,4 @@ if not os.path.isdir(argv[1]):
     os.mkdir(argv[1])
 
 crawler = BingImageCrawler(storage={"root_dir": argv[1]})
-crawler.crawl(keyword=argv[2], max_num=100)
+crawler.crawl(keyword=argv[2], max_num=3000)
