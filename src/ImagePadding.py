@@ -5,14 +5,14 @@ import os
 import glob
 
 # 1枚あたり20枚の画像を水増し
-N_img = 30
+N_img = 10
 
 # 入力画像の保存先パス
-input_path = 'data/image/ok'
+input_path = 'data/image/ng'
 files = glob.glob(input_path + '/*.jpg')
  
 # 出力画像の保存先パス
-output_path = "data/image/ok"
+output_path = "data/image/ng"
 if os.path.isdir(output_path) == False:
     os.mkdir(output_path)
  
@@ -39,9 +39,3 @@ for i, file in enumerate(files):
     dg = datagen.flow(x, batch_size=1, save_to_dir=output_path, save_prefix='', save_format='jpg')
     for i in range(N_img):
         batch = dg.next()
-
-
-# 001003.jpg, 00104.jpg ...
-tmp_dir = 'data/image/ok'
-for i, file in enumerate(os.listdir(tmp_dir)):
-    os.rename(tmp_dir + '/' + file, tmp_dir + '/' + str(i+1).zfill(6) + '.jpg')
