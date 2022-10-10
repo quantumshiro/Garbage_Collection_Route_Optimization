@@ -5,14 +5,14 @@ import os
 import glob
 
 # 1枚あたり20枚の画像を水増し
-N_img = 100
+N_img = 10
 
 # 入力画像の保存先パス
 input_path = 'data/image/ok'
 files = glob.glob(input_path + '/*.jpg')
  
 # 出力画像の保存先パス
-output_path = "data/image/tmp"
+output_path = "data/image/ok"
 if os.path.isdir(output_path) == False:
     os.mkdir(output_path)
  
@@ -27,8 +27,8 @@ for i, file in enumerate(files):
     datagen = ImageDataGenerator(
         zca_epsilon=1e-06,   # 白色化のイプシロン
         rotation_range=10.0, # ランダムに回転させる範囲
-        width_shift_range=0.0, # ランダムに幅をシフトさせる範囲
-        height_shift_range=0.0, # ランダムに高さをシフトさせる範囲
+        width_shift_range=0.1, # ランダムに幅をシフトさせる範囲
+        height_shift_range=0.1, # ランダムに高さをシフトさせる範囲
         brightness_range=None, # ランダムに明るさを変化させる範囲
         zoom_range=0.0,        # ランダムにズームさせる範囲
         horizontal_flip=True, # ランダムに水平方向に反転させる
@@ -41,8 +41,7 @@ for i, file in enumerate(files):
         batch = dg.next()
 
 
-# 170.jpg, 171.jpg ...
-tmp_dir = 'data/image/tmp'
-for i, file in enumerate(glob.glob(tmp_dir + '/*.jpg')):
-    os.rename(file, tmp_dir + '/' + str(170+i) + '.jpg')
-    os.move(tmp_dir + '/' + str(170+i) + '.jpg', input_path)
+# 001003.jpg, 00104.jpg ...
+tmp_dir = 'data/image/ok'
+for i, file in enumerate(os.listdir(tmp_dir)):
+    os.rename(tmp_dir + '/' + file, tmp_dir + '/' + str(i+1).zfill(6) + '.jpg')
