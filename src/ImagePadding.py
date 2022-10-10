@@ -1,36 +1,48 @@
-from keras.preprocessing.image import load_img, img_to_array
+from keras_preprocessing.image import load_img, img_to_array
 from keras.preprocessing.image import ImageDataGenerator
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 import glob
 
-N_img = 1000
+# 1枚あたり20枚の画像を水増し
+N_img = 100
 
+# 入力画像の保存先パス
 input_path = 'data/image/ok'
 files = glob.glob(input_path + '/*.jpg')
-
-ouput_path = 'data/image/ok'
-if os.path.isdir(ouput_path) == False:
-    os.mkdir(ouput_path)
-    
+ 
+# 出力画像の保存先パス
+output_path = "data/image/tmp"
+if os.path.isdir(output_path) == False:
+    os.mkdir(output_path)
+ 
+ 
 for i, file in enumerate(files):
+ 
     img = load_img(file)
-    x   = img_to_array(img)
-    x   = np.expand_dims(x, axis=0)
-    
-    # Generate ImageDataGenerator
-    datagen = ImageDataGenerator (
-        zca_epsilon=1e-06,   
-        rotation_range=10.0,
-        width_shift_range=0.0, 
-        height_shift_range=0.0, 
-        brightness_range=None, 
-        zoom_range=0.0,       
-        horizontal_flip=True, 
-        vertical_flip=True, 
+    x = img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+ 
+    # ImageDataGeneratorの生成
+    datagen = ImageDataGenerator(
+        zca_epsilon=1e-06,   # 白色化のイプシロン
+        rotation_range=10.0, # ランダムに回転させる範囲
+        width_shift_range=0.0, # ランダムに幅をシフトさせる範囲
+        height_shift_range=0.0, # ランダムに高さをシフトさせる範囲
+        brightness_range=None, # ランダムに明るさを変化させる範囲
+        zoom_range=0.0,        # ランダムにズームさせる範囲
+        horizontal_flip=True, # ランダムに水平方向に反転させる
+        vertical_flip=True, # ランダムに垂直方向に反転させる
     )
-    
-    dg = datagen.flow(x, batch_siz=1, save_to_dir=ouput_path, save_prefix='img', save_format='jpg')
-    for i in range(170, N_img):
+ 
+    # 1枚あたり20枚の画像を水増し生成
+    dg = datagen.flow(x, batch_size=1, save_to_dir=output_path, save_prefix='', save_format='jpg')
+    for i in range(N_img):
         batch = dg.next()
+
+
+# 170.jpg, 171.jpg ...
+tmp_dir = 'data/image/tmp'
+for i, file in enumerate(glob.glob(tmp_dir + '/*.jpg')):
+    os.rename(file, tmp_dir + '/' + str(170+i) + '.jpg')
+    os.move(tmp_dir + '/' + str(170+i) + '.jpg', input_path)
