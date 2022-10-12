@@ -5,7 +5,7 @@ import os
 import glob
 
 # 1枚あたり20枚の画像を水増し
-N_img = 500
+N_img = 50
 
 # 入力画像の保存先パス
 input_path = 'data/image/ng'
