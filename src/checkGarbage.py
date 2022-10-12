@@ -24,6 +24,7 @@ epochs = 50
 lr = 3e-5
 gamma = 0.7
 seed = 42
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def seed_everything(seed):
     random.seed(seed)
@@ -33,8 +34,6 @@ def seed_everything(seed):
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
-    
-seed_everything(seed)
 
 def image_dir_train_test_sprit(original_dir, base_dir, train_size=0.8):
     '''
@@ -113,9 +112,125 @@ def image_dir_train_test_sprit(original_dir, base_dir, train_size=0.8):
 
     print("分割終了")
     
+def mixup_data(x, y, alpha=1.0, use_cuda=True):
+    if alpha > 0:
+        lam = np.random.beta(alpha, alpha)
+    else:
+        lam = 1
+    batch_size = x.size()[0]
+    
+    if use_cuda:
+        index = torch.randperm(batch_size).cuda()
+    else:
+        index = torch.randperm(batch_size)
+    
+    mixed_x = lam * x + (1 - lam) * x[index,:]
+    y_a, y_b = y, y[index]
+    
+    return mixed_x, y_a, y_b, lam
+
 def main():
     # image dir train test split
-    image_dir_train_test_sprit(original_dir='data/image', base_dir='data/image/split_data', train_size=0.8)
+    # image_dir_train_test_sprit(original_dir='data/image', base_dir='data/image/split_data', train_size=0.8)
+    seed_everything(seed)
+    
+    train_dir = 'data/image/split_data/train'
+    val_dir = 'data/image/split_data/validation'
+    
+    files = glob.glob('data/image/split_data/*/*/*.jpg')
+    print('train data num: ', len(files))
+    random_idx = np.random.randint(1, len(files), size=9)
+    
+    train_transforms = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ]
+    )
+    
+    val_transforms = transforms.Compose(
+        [
+            transforms.Resize(224),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ]
+    )
+    
+    train_data = datasets.ImageFolder(train_dir, transform=train_transforms)
+    val_data = datasets.ImageFolder(val_dir, transform=val_transforms)
+    
+    train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
+    val_loader = DataLoader(val_data, batch_size=32, shuffle=True)
+    
+    # read Vit Model
+    model_names = timm.list_models(pretrained=True)
+    pprint(model_names)
+    
+    model = timm.create_model('vit_base_patch16_224', pretrained=True)
+    
+    # train model
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=gamma)
+    
+    train_acc_list = []
+    val_acc_list = []
+    train_loss_list = []
+    val_loss_list = []
+    
+    for epoch in range(epochs):
+        epoch_loss = 0
+        epoch_accuracy = 0
+
+        for data, label in tqdm(train_loader):
+            data,target_a,target_b,lam = mixup_data(data, label, alpha=1.0, use_cuda=torch.cuda.is_available())
+            data = data.to(device)
+            label = target_a.to(device)
+
+            output = model(data)
+            loss = criterion(output, label)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            acc = (output.argmax(dim=1) == label).float().mean()
+            epoch_accuracy += acc / len(train_loader)
+            epoch_loss += loss / len(train_loader)              
+
+    with torch.no_grad():
+        epoch_val_accuracy = 0
+        epoch_val_loss = 0
+        for data, label in valid_loader:
+            data = data.to(device)
+            label = label.to(device)
+
+            val_output = model(data)
+            val_loss = criterion(val_output, label)
+
+            acc = (val_output.argmax(dim=1) == label).float().mean()
+            epoch_val_accuracy += acc / len(valid_loader)
+            epoch_val_loss += val_loss / len(valid_loader)
+
+    print(
+        f"Epoch : {epoch+1} - loss : {epoch_loss:.4f} - acc: {epoch_accuracy:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f}\n"
+    )
+    train_acc_list.append(epoch_accuracy)
+    val_acc_list.append(epoch_val_accuracy)
+    train_loss_list.append(epoch_loss)
+    val_loss_list.append(epoch_val_loss)
+        
     
 if __name__ == '__main__':
     main()
+    
