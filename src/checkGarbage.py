@@ -231,7 +231,10 @@ def main():
     val_loss_list.append(epoch_val_loss)
         
     # save model
-    torch.save(model.state_dict(), 'model.pth')
+    # save dir -> model/model.pth
+    if not os.path.exists('model'):
+        os.mkdir('model')
+    torch.save(model.state_dict(), 'model/model.pth')
     
     
 if __name__ == '__main__':
