@@ -230,6 +230,9 @@ def main():
     train_loss_list.append(epoch_loss)
     val_loss_list.append(epoch_val_loss)
         
+    # save model
+    torch.save(model.state_dict(), 'model.pth')
+    
     
 if __name__ == '__main__':
     main()
