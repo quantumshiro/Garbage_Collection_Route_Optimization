@@ -24,7 +24,7 @@ epochs = 50
 lr = 3e-5
 gamma = 0.7
 seed = 42
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cuda'
 
 def seed_everything(seed):
     random.seed(seed)
@@ -211,7 +211,7 @@ def main():
     with torch.no_grad():
         epoch_val_accuracy = 0
         epoch_val_loss = 0
-        for data, label in valid_loader:
+        for data, label in val_loader:
             data = data.to(device)
             label = label.to(device)
 
@@ -219,8 +219,8 @@ def main():
             val_loss = criterion(val_output, label)
 
             acc = (val_output.argmax(dim=1) == label).float().mean()
-            epoch_val_accuracy += acc / len(valid_loader)
-            epoch_val_loss += val_loss / len(valid_loader)
+            epoch_val_accuracy += acc / len(val_loader)
+            epoch_val_loss += val_loss / len(val_loader)
 
     print(
         f"Epoch : {epoch+1} - loss : {epoch_loss:.4f} - acc: {epoch_accuracy:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f}\n"
