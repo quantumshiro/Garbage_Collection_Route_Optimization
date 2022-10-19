@@ -177,7 +177,7 @@ def main():
     pprint(model_names)
     
     model = timm.create_model('vit_base_patch16_224_in21k', pretrained=True)
-    model.to("cuda:0")
+    model.to(device)
     
     # train model
     criterion = nn.CrossEntropyLoss()
