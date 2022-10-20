@@ -176,7 +176,7 @@ def main():
     model_names = timm.list_models(pretrained=True)
     pprint(model_names)
     
-    model = timm.create_model('vit_base_patch16_224_in21k', pretrained=True)
+    model = timm.create_model('vit_base_patch16_224_in21k', pretrained=True, num_classes=2)
     model.to(device)
     
     # train model
