@@ -139,7 +139,7 @@ def main():
     
     files = glob.glob('data/image/split_data/*/*/*.jpg')
     print('train data num: ', len(files))
-    random_idx = np.random.randint(1, len(files), size=9)
+    # random_idx = np.random.randint(1, len(files), size=9)
     
     train_transforms = transforms.Compose(
         [
