@@ -44,8 +44,12 @@ def main():
     for i in range(44):
         G = make_graph(df, i)
         nx.draw_networkx(G, with_labels=True)
-        print('cluster_id: {}'.format(i))
-        print('number of nodes: {}'.format(G.number_of_nodes()))
+        #print('cluster_id: {}'.format(i))
+        #print('number of nodes: {}'.format(G.number_of_nodes()))
+        # minimum spanning tree
+        T = nx.minimum_spanning_tree(G)
+        print('number of edges: {}'.format(T.number_of_edges()))
+        print(T.nodes())
     
 if __name__ == '__main__':
     main()
