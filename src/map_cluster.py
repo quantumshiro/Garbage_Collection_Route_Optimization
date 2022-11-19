@@ -49,6 +49,7 @@ def main():
         # minimum spanning tree
         T = nx.minimum_spanning_tree(G)
         print('number of edges: {}'.format(T.number_of_edges()))
+        print('number of nodes: {}'.format(T.number_of_nodes()))
     
 if __name__ == '__main__':
     main()
