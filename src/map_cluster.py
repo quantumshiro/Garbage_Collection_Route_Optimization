@@ -44,6 +44,8 @@ def main():
     for i in range(44):
         G = make_graph(df, i)
         nx.draw_networkx(G, with_labels=True)
+        print('cluster_id: {}'.format(i))
+        print('number of nodes: {}'.format(G.number_of_nodes()))
     
 if __name__ == '__main__':
     main()
