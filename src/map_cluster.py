@@ -48,9 +48,9 @@ def main():
         #print('number of nodes: {}'.format(G.number_of_nodes()))
         # minimum spanning tree
         T = nx.minimum_spanning_tree(G)
-        print('number of edges: {}'.format(T.number_of_edges()))
-        plt.show()
-        plt.savefig('data/map/cluster{}.png'.format(i))
+        # print('number of edges: {}'.format(T.number_of_edges()))
+        # print Order of visitation
+        print('Order of visitation: {}'.format(list(nx.dfs_preorder_nodes(T, '大阪府堺市北区西中島1-1-1'))))
     
 if __name__ == '__main__':
     main()
