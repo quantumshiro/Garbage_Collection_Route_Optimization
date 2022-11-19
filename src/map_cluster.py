@@ -50,16 +50,10 @@ def main():
     # print(df.head())
     for i in range(44):
         G = make_graph(df, i)
-        nx.draw_networkx(G, with_labels=True)
-        #print('cluster_id: {}'.format(i))
-        #print('number of nodes: {}'.format(G.number_of_nodes()))
-        # minimum spanning tree
-        T = nx.minimum_spanning_tree(G)
-        nx.draw_networkx(T, with_labels=True)
         print('cluster_id: {}'.format(i))
         # print('number of nodes: {}'.format(T.number_of_nodes()))
         # print list of nodes
-        print('list of nodes: {}'.format(T.nodes()))
+        print('list of nodes: {}'.format(G.nodes()))
     
     # test
     print(get_coordinates(df, '楠葉朝日2丁目19-3'))
