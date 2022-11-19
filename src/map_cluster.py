@@ -4,6 +4,7 @@ from geopy.geocoders import Nominatim
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import networkx as nx
+from geojson import Feature, FeatureCollection, Point, dump
 
 def get_data(data_path):
     df = pd.read_excel(data_path)
@@ -16,6 +17,15 @@ def get_lat_lon():
     lat = location.latitude
     lon = location.longitude
     print('The geograpical coordinate of {} are {}, {}.'.format(address, lat, lon))
+    return lat, lon
+
+def get_coordinates(df, place_name='住所'):
+    # get coordinates of the place
+    address = df[df['住所'] == place_name]['住所'].values[0]
+    geolocator = Nominatim(user_agent="foursquare_agent")
+    location = geolocator.geocode(address)
+    lat = location.latitude
+    lon = location.longitude
     return lat, lon
 
 def cluster_map(df, X, Y, n_clusters):
@@ -32,8 +42,9 @@ def make_graph(df, cluster_id) -> nx.Graph:
     for i in range(len(df_cluster)):
         for j in range(i + 1, len(df_cluster)):
             G.add_edge(df_cluster.iloc[i]['住所'], df_cluster.iloc[j]['住所'])
-    return G
-        
+    # minumum spanning tree
+    return nx.minimum_spanning_tree(G) 
+
 
 def main():
     df = get_data('data/garbage_place.xlsx')
@@ -48,9 +59,14 @@ def main():
         #print('number of nodes: {}'.format(G.number_of_nodes()))
         # minimum spanning tree
         T = nx.minimum_spanning_tree(G)
-        print('number of edges: {}'.format(T.number_of_edges()))
-        print('number of nodes: {}'.format(T.number_of_nodes()))
+        nx.draw_networkx(T, with_labels=True)
+        print('cluster_id: {}'.format(i))
+        # print('number of nodes: {}'.format(T.number_of_nodes()))
+        # print list of nodes
+        print('list of nodes: {}'.format(T.nodes()))
     
+    print(get_coordinates(df, '楠葉朝日2丁目19-3'))
+
 if __name__ == '__main__':
     main()
     
