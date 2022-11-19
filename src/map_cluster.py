@@ -21,11 +21,7 @@ def get_lat_lon():
 
 def get_coordinates(df, place_name='住所'):
     # get coordinates of the place
-    address = df[df['住所'] == place_name]['住所'].values[0]
-    geolocator = Nominatim(user_agent="foursquare_agent")
-    location = geolocator.geocode(address)
-    lat = location.latitude
-    lon = location.longitude
+    lat, lon = df[df['住所'] == place_name]['X'].values[0], df[df['住所'] == place_name]['Y'].values[0]
     return lat, lon
 
 def cluster_map(df, X, Y, n_clusters):
@@ -65,6 +61,7 @@ def main():
         # print list of nodes
         print('list of nodes: {}'.format(T.nodes()))
     
+    # test
     print(get_coordinates(df, '楠葉朝日2丁目19-3'))
 
 if __name__ == '__main__':
