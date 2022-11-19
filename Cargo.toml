@@ -1,0 +1,11 @@
+[package]
+name = "garbage_collection_route_optimization"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pyo3 = { version = "0.15", feature = ["auto-initialize"] }
+rocket = "0.4"
+rocket_contrib = { version = "0.4", features = ["json"] }
