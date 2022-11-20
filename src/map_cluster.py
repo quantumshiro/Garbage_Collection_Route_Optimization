@@ -41,6 +41,13 @@ def make_graph(df, cluster_id) -> nx.Graph:
     # minumum spanning tree
     return nx.minimum_spanning_tree(G) 
 
+def make_geojson(df, cluster_id, graph):
+    for i in range(len(df)):
+        if df.iloc[i]['cluster_id'] == cluster_id:
+            point = Point((df.iloc[i]['X'], df.iloc[i]['Y']))
+            feature = Feature(geometry=point, properties={'name': df.iloc[i]['住所']})
+            features.append(feature)
+    return features
 
 def main():
     df = get_data('data/garbage_place.xlsx')
@@ -48,13 +55,15 @@ def main():
     cluster = cluster_map(df, 'X', 'Y', 44)
     df['cluster_id'] = cluster
     # print(df.head())
+    
     for i in range(44):
         G = make_graph(df, i)
         print('cluster_id: {}'.format(i))
         # print('number of nodes: {}'.format(T.number_of_nodes()))
         # print list of nodes
         print('list of nodes: {}'.format(G.nodes()))
-    
+        json = make_geojson(df, i, G)
+        print(json)
     # test
     print(get_coordinates(df, '楠葉朝日2丁目19-3'))
 
