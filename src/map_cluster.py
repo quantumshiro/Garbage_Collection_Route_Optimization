@@ -85,7 +85,7 @@ def get_cluster(map_id: int):
     cluster = cluster_map(df, "X", "Y", 44)
     df["cluster_id"] = cluster
     json = make_geojson(df, map_id)
-    return json
+    return JSONResponse(content=json)
 if __name__ == '__main__':
     main()
     
