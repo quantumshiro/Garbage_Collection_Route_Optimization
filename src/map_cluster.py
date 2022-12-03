@@ -6,9 +6,32 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from geojson import Feature, FeatureCollection, Point, dump
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
+import pathlib
+from fastapi.responses import RedirectResponse
+
+# pathlib.Pathを使って、staticディレクトリの絶対パスを取得
+PATH_STATIC = str(pathlib.Path(__file__).resolve().parent / "front/static")
 
 app = FastAPI()
+origins = ["http://localhost:8000"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.mount(
+    "/static",
+    StaticFiles(directory=PATH_STATIC, html=False),
+    name="static",
+)
+templates = Jinja2Templates(directory="templates")
 
 def get_data(data_path):
     df = pd.read_excel(data_path)
@@ -75,17 +98,6 @@ def main():
     # test
     # print(get_coordinates(df, '楠葉朝日2丁目19-3'))
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-@app.get("/cluster/{map_id}")
-def get_cluster(map_id: int):
-    df = get_data("../data/garbage_place.xlsx")
-    cluster = cluster_map(df, "X", "Y", 44)
-    df["cluster_id"] = cluster
-    json = make_geojson(df, map_id)
-    return JSONResponse(content=json)
 if __name__ == '__main__':
     main()
     

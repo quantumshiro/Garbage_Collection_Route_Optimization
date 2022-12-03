@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        #map {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="map"></p>
+</body>
+<script>
+    let car = 0;
+    window.onload = function() {
+        // get url
+        const url = new URL(window.loation.href);
+
+        const params = url.searchParams;
+
+        // get params
+        car = params.get('car');
+
+    }
+    // 34.84153679681621, 135.7051004135167
+    let lat = 34.84153679681621; // 緯度
+    let lng = 135.7051004135167; // 経度
+    let zoom = 16; // ズームレベル
+    let map = L.map("map"); // 地図の生成
+    map.setView([lat, lng], zoom); // 緯度経度、ズームレベルを設定する
+
+    // タイルレイヤを生成し、地図に追加する
+    // 今回はOpenStreetMapを表示する
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // 著作権の表示
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    var xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            if (this.response) {
+                console.log(this.response);
+                // 読み込んだ後処理したい内容をかく
+                // read json
+                // document.getElementById("json").innerHTML = JSON.stringify(this.response);
+                L.geoJSON(this.response).addTo(map);
+            }
+        }
+    }
+
+    xmlHttpRequest.open('GET', 'http://127.0.0.1:8000/cluster/'+car, true);
+    xmlHttpRequest.responseType = 'json';
+    xmlHttpRequest.send(null);
+</script>
+
+</html>

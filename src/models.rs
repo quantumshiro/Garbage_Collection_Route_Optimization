@@ -1,7 +1,12 @@
-use serde::{Deserialize, Serialize};
+// map_id: u32
+// geojson
+//
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Map {
-    pub map_id: i32,
-    pub description: String,
+use geojson::GeoJson;
+use hyper::{Client, Response};
+
+type MapId = u32;
+
+pub async fn get_geojson(map_id: u32) -> GeoJson {
+
 }

@@ -1,36 +1,22 @@
-use rocket_contrib::json::Json;
-use geojson::{Feature, GeoJson, Geometry, Value};
-use pyo3::prelude::*;
-use pyo3::types::PyList;
-use std::env;
+use actix_web::{Responder, HttpResponse, get, web};
+use geojson::{GeoJson, Value};
+use reqwest::{Client, Response};
+
 
 #[get("/")]
-pub fn index() -> &'static str {
-    "Hello, world!"
+pub async fn info() -> impl Responder {
+    HttpResponse::Ok().body("Hello world!")
 }
 
-// return geojson
-#[get("/map")]
-pub fn map() -> Json<GeoJson> {
-    let gil = Python::acquire_gil();
-    let py = gil.python();
-    let syspath: &PyList = py.import("sys").unwrap().get("path").unwrap().extract().unwrap();
-    let path = env::current_dir();
-    syspath.insert(0, path.unwrap().join("src").join("python").to_str().unwrap()).unwrap();
+#[get("/map/{id}")]
+async fn get_geojson(web::Path(id): web::Path<u32>) -> impl Responder {
+    // get a geojson from a url
+    let client = Client::new();
+    let url = format!("https://127.0.0.1/cluster/{}", id);
+    let response: Response = client.get(&url).send().await.unwrap();
+    let geojson: GeoJson = response.json().await.unwrap();
 
-    let getdata = py.import("get_data").unwrap();
-    // use getattr(name)?.call1(args)
-    let response = getdata.call1("get_data", ("data/garbage_place.xlsx", ));
-    print!("{:?}", response);
-
-    let geometry = Geometry::new(Value::Point(vec![-122.6764, 45.5165]));
-    let feature = Feature {
-        bbox: None,
-        geometry: Some(geometry),
-        id: None,
-        properties: None,
-        foreign_members: None,
-    };
-    let geojson = GeoJson::Feature(feature);
-    Json(geojson)
+    // return the geojson
+    HttpResponse::Ok().json(geojson)
+    
 }
