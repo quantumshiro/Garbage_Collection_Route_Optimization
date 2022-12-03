@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  api:
+    container_name: "API"
+    volumes:
+      - ./api:/app
+    build: .
+    ports:
+      - "8000:8000"

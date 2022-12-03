@@ -8,7 +8,6 @@ import pathlib
 from fastapi.responses import RedirectResponse
 from src.map_cluster import *
 
-
 @app.get("/")
 def root():
     return HTMLResponse(open("src/front/templates/index.html", "r").read())
@@ -20,7 +19,7 @@ async def read_root(map_id: str):
 
 @app.get("/cluster/{map_id}")
 def get_cluster(map_id: int):
-    df = get_data("./data/garbage_place.xlsx")
+    df = get_data("data/garbage_place.xlsx")
     cluster = cluster_map(df, "X", "Y", 44)
     df["cluster_id"] = cluster
     json = make_geojson(df, map_id)
