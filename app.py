@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 import pathlib
 from fastapi.responses import RedirectResponse
-from src.map_cluster import *
+from src.lib.map_cluster import *
 
 @app.get("/")
 def root():
