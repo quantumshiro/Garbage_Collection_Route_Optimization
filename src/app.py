@@ -12,14 +12,14 @@ app = FastAPI()
 
 @app.get("/")
 def root():
-    return HTMLResponse(open("front/templates/index.html", "r").read())
+    return HTMLResponse(open("src/front/templates/index.html", "r").read())
 
 @app.get("/map/{map_id}")
 async def read_root(map_id: str):
     # return index.html
-    return HTMLResponse(open("front/templates/"+map_id+".html", "r").read())
+    return HTMLResponse(open("src/front/templates/"+map_id+".html", "r").read())
 
-@app.get("/cluster/{map_id}")
+@app.get("/geography/cluster/{map_id}")
 def get_cluster(map_id: int):
     df = get_data("./data/garbage_place.xlsx")
     cluster = cluster_map(df, "X", "Y", 44)
