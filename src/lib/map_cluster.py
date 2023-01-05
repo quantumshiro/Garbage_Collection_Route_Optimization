@@ -1,10 +1,13 @@
+import itertools
 import pandas as pd
 import numpy as np
 from geopy.geocoders import Nominatim
 from sklearn.cluster import KMeans
+from pyclustering.cluster import gmeans
 import matplotlib.pyplot as plt
 import networkx as nx
 from geojson import Feature, FeatureCollection, Point, dump
+import matplotlib.pyplot as plt
 
 def get_data(data_path):
     df = pd.read_excel(data_path)
@@ -28,6 +31,16 @@ def cluster_map(df, X, Y, n_clusters):
     cust_array = np.array([df[X].tolist(), df[Y].tolist()]).T
     pred = KMeans(n_clusters=n_clusters, random_state=0).fit_predict(cust_array)
     return pred
+
+def gmeans_map(df, X, Y):
+    cust_array = np.array([df[X].tolist(), df[Y].tolist()]).T
+    initial_centers = gmeans.kmeans_plusplus_initializer(X, 2).initialize()
+    gm = gmeans.gmeans(cust_array, initial_centers).process()
+
+    # obtain clusters
+    clusters = gm.get_clusters()
+    return clusters
+
 
 # Create each graph based on the map after clustering
 def make_graph(df, cluster_id) -> nx.Graph:
@@ -56,15 +69,17 @@ def main():
     cluster = cluster_map(df, 'X', 'Y', 44)
     df['cluster_id'] = cluster
     # print(df.head())
-    for i in range(44):
-        G = make_graph(df, i)
-        print('cluster_id: {}'.format(i))
+    # for i in range(44):
+        # G = make_graph(df, i)
+        # print('cluster_id: {}'.format(i))
         # print('number of nodes: {}'.format(T.number_of_nodes()))
         # print list of nodes
-        print('list of nodes: {}'.format(G.nodes()))
+        # print('list of nodes: {}'.format(G.nodes()))
     
     # test
     print(get_coordinates(df, '楠葉朝日2丁目19-3'))
+
+    # print(gmeans_map(df, 'X', 'Y'))
 
 if __name__ == '__main__':
     main()
